@@ -25,7 +25,6 @@ print("Waiting for new Telegram message event...")
 
 @client.on(events.NewMessage(chat))
 async def my_event_handler(event):
-    print("Waiting for new Telegram message event...")
     chath = await event.get_chat()
     senderh = await event.get_sender()
     chat_idh = event.chat_id
@@ -37,10 +36,10 @@ async def my_event_handler(event):
         # Write message whatever you want to post in twitter
         api.update_status(msg + " #LaxzAutoTweet" )
     
-    if 'Click To Tweet' in event.raw_text:
-        # print(event.raw_text)
+    if 'WhatsHappeningInMyanmar' in event.raw_text:
+        print(event.text)
         print(f'{datetime.now()}, Tweeted')
-        tweet(event.raw_text)
+        tweet(event.text)
         # await event.reply('auto reply to event "Click To Tweet", tweeted!')
 
 client.start()
