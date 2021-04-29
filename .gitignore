@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+telegram_secs.py
+twitter_secs.py
+anon.session
+test/
