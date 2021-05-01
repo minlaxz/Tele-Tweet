@@ -12,3 +12,4 @@ six==1.15.0
 Telethon==1.21.1
 tweepy==3.10.0
 urllib3==1.26.4
+rich
