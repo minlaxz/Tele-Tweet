@@ -132,4 +132,7 @@ telegram_secs.py
 twitter_secs.py
 anon.session
 anon.session-journal
+anone.session
+anone.session-journal
 test/
+main2.py
