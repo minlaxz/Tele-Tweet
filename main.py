@@ -1,11 +1,17 @@
+# Library imports
 import tweepy
 from telethon import TelegramClient, events
 from datetime import datetime
+from rich import pretty, print
+from rich.console import Console
+
+# Security key imports
 import twitter_secs as tt
 import telegram_secs as te
-from rich import pretty, print
+import textcolors as css
 
 pretty.install()
+console = Console()
 
 # Authenticate to Twitter
 auth = tweepy.OAuthHandler(tt.app_api_key, tt.app_api_secret)
@@ -16,45 +22,46 @@ api = tweepy.API(auth)
 
 try:
     api.verify_credentials()
-    print("Twitter Authentication OK")
+    print("[green]Twitter Authentication OK[/green]")
 except:
-    print("Error during twitter authentication")
+    print("[red]Error during twitter authentication[/red]")
 
+# Specify Channel name to caught broadcasting posts
 chat = "Click&Tweet"
+
+# Authenticate to Telegram
 client = TelegramClient("anon", te.api_id, te.api_hash)
-print("Waiting for new Telegram message event...")
+
+# print("Hello", style="#af00ff")
+console.print("Waiting for new Telegram message event...", style=css.dodgetblue)
 
 
 @client.on(events.NewMessage(chat))
 async def my_event_handler(event):
-
-    # print(chath, senderh, chat_idh, sender_idh)
-
-    def tweet(msg):
+    def make_tweet(msg):
         # Write message whatever you want to post in twitter
-        api.update_status(msg + " #LaxzTweeted")
+        api.update_status(msg + "\n#LaxzTweeted")
 
-    if "WhatsHappeningInMyanmar" in event.raw_text:
+    if (
+        "WhatsHappeningInMyanmar" in event.raw_text
+        or "ASIEANengageNUG" in event.raw_text
+    ):
+        print("-----------------------------------")
         print(event.text)
+        print("---------------")
         try:
-            tweet(event.text)
-            print(f"{datetime.now()}, Tweeted.")
-        except tweepy.error.TweepError:
-            chat_event = await event.get_chat()
-            sender_event = await event.get_sender()
-            chat_id = event.chat_id
-            sender_id = event.sender_id
-            print(
-                [
-                    f"Chat : {chat_event}",
-                    f"ChatID : {chat_id}",
-                    f"Sender : {sender_event}",
-                    f"SenderID : {sender_id}",
-                ]
+            make_tweet(event.text)
+            print(f"[green]{datetime.now()}, Tweeted.[/green]")
+            await client.send_message(
+                chat, "Event- {} is Tweeted.".format(event.id), comment_to=event.id
             )
-            print(event.text)
-            print(f"{datetime.now()}, Cannot Tweet!")
-        # await event.reply('auto reply to event "Click To Tweet", tweeted!')
+            print(f"Commented to Message ID : {event.id}")
+        except tweepy.error.TweepError as e:
+            print(f"[bold magenta] {e} [/bold magenta]")
+            print(f"[red]{datetime.now()}, This need to be tweeted manually.[/red]")
+
+        # await event.reply("auto reply to event, tweeted!")
+        print("-----------------------------------")
 
 
 client.start()
