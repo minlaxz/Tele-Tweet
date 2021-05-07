@@ -27,5 +27,5 @@ openssl enc -aes-256-cbc -d -salt -pbkdf2 -in telegram.encrypted -out telegram_s
 oneLineOutput "decrypting twitter credentials."
 openssl enc -aes-256-cbc -d -salt -pbkdf2 -in twitter.encrypted -out twitter_secs.py
 descriptionOutput "decrypting telegram sessions."
-openssl enc -aes-256-cbc -d -salt -pbkdf2 -in anon.encrypted -out anon.session
+openssl enc -aes-256-cbc -d -salt -pbkdf2 -in anone.encrypted -out anon.session
 warningOutput "Done, run tele-tweet with 'python main.py'"
