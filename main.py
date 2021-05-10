@@ -53,7 +53,9 @@ async def my_event_handler(event):
             make_tweet(event.text)
             print(f"[green]{datetime.now()}, Tweeted.[/green]")
             await client.send_message(
-                chat, "Event- {} is Tweeted.".format(event.id), comment_to=event.id
+                chat,
+                "Previous Event- {} is Tweeted.".format(event.id),
+                comment_to=event.id + 1,
             )
             print(f"Commented to Message ID : {event.id}")
         except tweepy.error.TweepError as e:
@@ -62,6 +64,17 @@ async def my_event_handler(event):
 
         # await event.reply("auto reply to event, tweeted!")
         print("-----------------------------------")
+    elif "Goodnight" in event.raw_text:
+        await client.send_message(
+            chat,
+            "Event {}, __Goodnight **Admins**__. `Be Safe`.".format(event.id),
+            comment_to=event.id,
+        )
+        # await client.send_file('me', '/home/me/Pictures/holidays.jpg')
+        print(f"[orange]{datetime.now()}, Script is gonna stop.[/orange]")
+
+    else:
+        pass
 
 
 client.start()
