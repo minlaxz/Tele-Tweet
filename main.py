@@ -1,13 +1,16 @@
 # Library imports
 import tweepy
 from telethon import TelegramClient, events
-from datetime import datetime
+import datetime
 from rich import pretty, print
 from rich.console import Console
+import re
 
 # Security key imports
 import twitter_secs as tt
 import telegram_secs as te
+
+# Local imports
 import textcolors as css
 
 pretty.install()
@@ -17,7 +20,7 @@ console = Console()
 auth = tweepy.OAuthHandler(tt.app_api_key, tt.app_api_secret)
 auth.set_access_token(tt.access_token, tt.access_token_secret)
 
-# Creation of the actual interface, using authentication
+# Creation of the actual interface, using authentication to twitter
 api = tweepy.API(auth)
 
 try:
@@ -36,6 +39,10 @@ client = TelegramClient("anon", te.api_id, te.api_hash)
 console.print("Waiting for new Telegram message event...", style=css.dodgetblue)
 
 
+def getDateTime():
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
 @client.on(events.NewMessage(chat))
 async def my_event_handler(event):
     def make_tweet(msg):
@@ -51,28 +58,37 @@ async def my_event_handler(event):
         print("---------------")
         try:
             make_tweet(event.text)
-            print(f"[green]{datetime.now()}, Tweeted.[/green]")
+            print(f"[green]{getDateTime()}, Tweeted.[/green]")
             await client.send_message(
                 chat,
-                "Previous Event- {} is Tweeted.".format(event.id),
+                f"Previous Event- {event.id} is Tweeted.",
                 comment_to=event.id + 1,
             )
             print(f"Commented to Message ID : {event.id}")
         except tweepy.error.TweepError as e:
             print(f"[bold magenta] {e} [/bold magenta]")
             print(f"[red]{datetime.now()}, This need to be tweeted manually.[/red]")
-
+            if isInstance(e, list) and e.code == 187:
+                await client.send_message(
+                    chat,
+                    f"{getDateTime()} - **Error on Event** - {event.id} \n ErrorMessage is {e[0].message}",
+                    comment_to=event.id + 1,
+                )
+            else:
+                print("Other error code or error type.")
         # await event.reply("auto reply to event, tweeted!")
         print("-----------------------------------")
     elif "Goodnight" in event.raw_text:
+        print("\a")
+        # x = re.findall("Goodnight", event.raw_text)
         await client.send_message(
             chat,
-            "Event {}, __Goodnight **Admins**__. `Be Safe`.".format(event.id),
+            "__Goodnight **Admins**__. `Be Safe`.",
             comment_to=event.id,
         )
         # await client.send_file('me', '/home/me/Pictures/holidays.jpg')
         print(f"[orange]{datetime.now()}, Script is gonna stop.[/orange]")
-
+        exit(0)
     else:
         pass
 
