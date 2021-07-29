@@ -1,1 +1,1 @@
-dodgetblue = "#1E90FF"
+dodgerblue = "#1E90FF"
