@@ -1,3 +1,4 @@
+from typing import Literal
 import tweepy
 from telethon import TelegramClient, events
 import datetime
@@ -16,10 +17,10 @@ auth = tweepy.OAuthHandler(tt.app_api_key, tt.app_api_secret)
 auth.set_access_token(tt.access_token, tt.access_token_secret)
 api = tweepy.API(auth)  # Create the actual interface to twitter, using credentials
 
-def getDateTime():
+def getDateTime() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-def printMessage(message: str, error: bool):
+def printMessage(message: str, error: bool) -> None:
     print(f"[red] {getDateTime()} :\n {message}[/red]") if error else print(f"[green] {getDateTime()} :\n {message}[/green]")
 
 try:
@@ -38,9 +39,9 @@ console.print("Waiting for new Telegram message event...", style=css.dodgerblue)
 
 
 @client.on(events.NewMessage(chat))
-async def my_event_handler(event):
-    def make_tweet(msg):
-        # Write message whatever you want to post in twitter
+async def my_event_handler(event: events.NewMessage.Event) -> None:
+    def make_tweet(msg: str) -> None:
+        # Post to twitter
         api.update_status(msg + "\n#LaxzTweeted")
 
     if (
@@ -49,23 +50,23 @@ async def my_event_handler(event):
     ):
         printMessage(message=f"-----------------------------------\n {event.text} \n-----------------", error=False)
         try:
-            make_tweet(event.text)
-            printMessage("Tweeted", False)
+            make_tweet(msg = event.text)
+            printMessage(message = "Tweeted", error = False)
             await client.send_message(
                 chat,
                 f"Previous Event- {event.id} is Tweeted.",
                 comment_to=event.id + 1,
             )
-            printMessage(f"Commented to Message ID : {event.id}", False)
+            printMessage(message = f"Commented to Message ID : {event.id}", error = False)
         except tweepy.TweepError as e:
-            printMessage(f"[red]This need to be tweeted manually.[/red]", True)
+            printMessage(message = f"[red]This need to be tweeted manually.[/red]", error = True)
             if isinstance(e, list) and "code" in e[0] and e[0]["code"] == 187:
                 await client.send_message(
                     chat,
                     f"{getDateTime()} => **Error on event** => {event.id} - ```errorCode:{e[0]['code']}```",
                     comment_to=event.id + 1,
                 )
-                printMessage(f"Commented to Message ID : {event.id}", True)
+                printMessage(message = f"Commented to Message ID : {event.id}", error = True)
                 print(f"Error message : {e[0].message}")
             else:
                 print(f"[bold magenta] Unhandled Exception : {e} [/bold magenta]")
@@ -79,7 +80,7 @@ async def my_event_handler(event):
             comment_to=event.id,
         )
         # await client.send_file('me', '/home/me/Pictures/holidays.jpg')
-        print(f"[orange]{getDateTime()}, Script is gonna stop.[/orange]")
+        printMessage(message = f"[orange]{getDateTime()}, Script is gonna stop.[/orange]", error = False)
         exit()
     else:
         pass
