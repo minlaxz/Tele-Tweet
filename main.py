@@ -1,20 +1,18 @@
-from typing import Literal
 import tweepy
 from telethon import TelegramClient, events
 import datetime
 from rich import pretty, print
 from rich.console import Console
 
-import twitter_secs as tt
-import telegram_secs as te
+from credentials import *
 import textcolors as css
 
 pretty.install()
 console = Console()
 
 # Authenticate to Twitter
-auth = tweepy.OAuthHandler(tt.app_api_key, tt.app_api_secret)
-auth.set_access_token(tt.access_token, tt.access_token_secret)
+auth = tweepy.OAuthHandler(twitter_app_api_key, twitter_app_api_secret)
+auth.set_access_token(twitter_access_token, twitter_access_token_secret)
 api = tweepy.API(auth)  # Create the actual interface to twitter, using credentials
 
 def getDateTime() -> str:
@@ -31,9 +29,9 @@ except:
 
 
 # Specify Channel name to caught broadcasting posts
-chat = "Click&Tweet"  
+chat = "Click&Tweet" 
 # Authenticate to Telegram
-client = TelegramClient("anon", te.api_id, te.api_hash)
+client = TelegramClient("anon", telegram_api_id, telegram_api_hash)
 # print("Hello", style="#af00ff")
 console.print("Waiting for new Telegram message event...", style=css.dodgerblue)
 
@@ -54,11 +52,11 @@ async def my_event_handler(event: events.NewMessage.Event) -> None:
             printMessage(message = "Tweeted", error = False)
             await client.send_message(
                 chat,
-                f"Previous Event- {event.id} is Tweeted.",
+                f"Previous Event- **{event.id}** is Tweeted.",
                 comment_to=event.id + 1,
             )
             printMessage(message = f"Commented to Message ID : {event.id}", error = False)
-        except tweepy.TweepError as e:
+        except tweepy.TweepyException as e:
             printMessage(message = f"[red]This need to be tweeted manually.[/red]", error = True)
             if isinstance(e, list) and "code" in e[0] and e[0]["code"] == 187:
                 await client.send_message(
@@ -74,16 +72,23 @@ async def my_event_handler(event: events.NewMessage.Event) -> None:
     elif "Goodnight" in event.raw_text:
         print("\a") 
         # x = re.findall("Goodnight", event.raw_text)
-        await client.send_message(
-            chat,
-            "__Goodnight **Admins**__. `Be Safe`.",
-            comment_to=event.id,
-        )
+        if "Thomas" in event.raw_text:
+            await client.send_message(
+                chat,
+                "__Goodnight **Admin Thomas**__.`Be Safe`.",
+                comment_to=event.id,
+            )
+        else:
+            await client.send_message(
+                chat,
+                "__Goodnight **Admins**__. `Be Safe`.",
+                comment_to=event.id,
+            )
         # await client.send_file('me', '/home/me/Pictures/holidays.jpg')
         printMessage(message = f"[orange]{getDateTime()}, Script is gonna stop.[/orange]", error = False)
         exit()
     else:
-        pass
+        print("passed")
 
 
 client.start()
