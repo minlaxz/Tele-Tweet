@@ -34,7 +34,7 @@ except:
 
 
 # Specify Channel name to caught broadcasting posts
-chat = "Click&Tweet"
+chat = "laxzisresting"
 # Authenticate to Telegram
 client = TelegramClient("anon", telegram_api_id, telegram_api_hash)
 # print("Hello", style="#af00ff")
